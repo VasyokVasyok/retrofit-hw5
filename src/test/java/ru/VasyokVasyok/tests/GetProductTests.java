@@ -2,6 +2,8 @@ package ru.VasyokVasyok.tests;
 
 import org.junit.jupiter.api.Test;
 import retrofit2.Response;
+import ru.VasyokVasyok.db.model.Products;
+import ru.VasyokVasyok.db.model.ProductsExample;
 import ru.VasyokVasyok.dto.Product;
 import ru.VasyokVasyok.enums.Category;
 
@@ -33,5 +35,9 @@ public class GetProductTests extends BaseTest {
                 .getProduct(id)
                 .execute();
         assertThat(response.body().getId()).isEqualTo(id);
+        ProductsExample example = new ProductsExample();
+        example.createCriteria().andCategory_idEqualTo(Long.valueOf(testCategory.getId()));
+        Products productFromDb = productsMapper.selectByExample(example).get(0);
+        assertThat(productFromDb.getId()).isEqualTo(product.getId());
     }
 }

@@ -1,13 +1,11 @@
 package ru.VasyokVasyok.tests;
 
-import netscape.javascript.JSObject;
-import org.json.JSONObject;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
 import retrofit2.Response;
+import ru.VasyokVasyok.db.model.Categories;
+import ru.VasyokVasyok.db.model.CategoriesExample;
 import ru.VasyokVasyok.dto.Category;
 import ru.VasyokVasyok.dto.InvalidRequest;
 import ru.VasyokVasyok.enums.InvalidData;
@@ -30,6 +28,10 @@ public class CategoriesTests extends BaseTest {
                 .body()
                 .getProducts()
                 .forEach(e -> assertThat(e.getCategoryTitle()).isEqualTo(category.getName()));
+        CategoriesExample example = new CategoriesExample();
+        example.createCriteria();
+        Categories categoriesFromDb = categoriesMapper.selectByExample(example).get(0);
+        assertThat(categoriesFromDb.getTitle()).isEqualTo(category.getId());
     }
 
     private void makeRequest(InvalidData invalidCategory) throws IOException {
@@ -49,6 +51,10 @@ public class CategoriesTests extends BaseTest {
     @EnumSource(value = ru.VasyokVasyok.enums.InvalidData.class, names = {"NONEXISTENT_CATEGORY"})
     void getNonexistentCategory(ru.VasyokVasyok.enums.InvalidData invalidCategory) throws IOException {
         makeRequest(invalidCategory);
+        CategoriesExample example = new CategoriesExample();
+        example.createCriteria();
+        Categories categoriesFromDb = categoriesMapper.selectByExample(example).get(0);
+        assertThat(categoriesFromDb.getTitle()).isNullOrEmpty();
     }
 
     //Негативная проверка. Запрос категории с id = 0.
@@ -56,6 +62,10 @@ public class CategoriesTests extends BaseTest {
     @EnumSource(value = ru.VasyokVasyok.enums.InvalidData.class, names = {"ZERO_NUMBER"})
     void getZeroIdCategory(ru.VasyokVasyok.enums.InvalidData invalidCategory) throws IOException {
         makeRequest(invalidCategory);
+        CategoriesExample example = new CategoriesExample();
+        example.createCriteria();
+        Categories categoriesFromDb = categoriesMapper.selectByExample(example).get(0);
+        assertThat(categoriesFromDb.getTitle()).isNullOrEmpty();
     }
 
     //Негативная проверка. Запрос категории с id = null.
@@ -67,6 +77,10 @@ public class CategoriesTests extends BaseTest {
         } catch (NullPointerException e) {
             System.out.println("That's good.");
         }
+        CategoriesExample example = new CategoriesExample();
+        example.createCriteria();
+        Categories categoriesFromDb = categoriesMapper.selectByExample(example).get(0);
+        assertThat(categoriesFromDb.getTitle()).isNullOrEmpty();
     }
 
     //Негативная проверка. Запрос категории с пустым id.
